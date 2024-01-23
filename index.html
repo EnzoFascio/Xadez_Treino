@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xadrez em Vue.js</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+    <div id="tabuleiro">
+        <div class="info">
+            <p>Jogador Atual: {{ currentPlayer }}</p>
+            <p>Placar - Jogador 1: {{ score.player1 }} | Jogador 2: {{ score.player2 }}</p>
+        </div>
+        <div class="captured-pieces">
+            <p>Peças Capturadas:</p>
+            <div v-for="(captured, index) in capturedPieces" :key="index" class="captured-piece">
+                {{ captured }}
+            </div>
+        </div>
+        <div v-for="(row, rowIndex) in tabuleiro" :key="rowIndex" class="row">
+            <div v-for="(piece, colIndex) in row" :key="colIndex"
+                 :class="getCellClasses(rowIndex, colIndex)"
+                 @click="handleCellClick(rowIndex, colIndex)"
+                 @mousedown="startDrag(rowIndex, colIndex)"
+                 @mousemove="handleDrag(rowIndex, colIndex)"
+                 @mouseup="endDrag(rowIndex, colIndex)"
+                 class="cell">
+                {{ piece }}
+            </div>
+        </div>
+        <button @click="resetGame">Resetar Jogo</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

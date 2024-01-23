@@ -1,0 +1,41 @@
+#tabuleiro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.cell-black {
+    background-color: #888;
+}
+
+.selected {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.info {
+    margin-bottom: 10px;
+}
+
+.captured-pieces {
+    margin-bottom: 10px;
+}
+
+.captured-piece {
+    display: inline-block;
+    margin: 0 5px;
+}
