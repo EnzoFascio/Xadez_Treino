@@ -21,7 +21,6 @@
         </div>
         <div v-for="(row, rowIndex) in tabuleiro" :key="rowIndex" class="row">
             <div v-for="(piece, colIndex) in row" :key="colIndex"
-                 :class="getCellClasses(rowIndex, colIndex)"
                  @click="handleCellClick(rowIndex, colIndex)"
                  @mousedown="startDrag(rowIndex, colIndex)"
                  @mousemove="handleDrag(rowIndex, colIndex)"
@@ -32,7 +31,9 @@
         </div>
         <button @click="resetGame">Resetar Jogo</button>
     </div>
-
+    <script type="module">
+        import { Chess } from '/node_modules/chess.js/dist/esm/chess.js'
+      </script>
     <script src="app.js"></script>
 </body>
 </html>

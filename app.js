@@ -1,88 +1,89 @@
-new Vue({
-    el: '#tabuleiro',
-    data: {
-        tabuleiro: [
+const app = new Vue({
+  el: '#tabuleiro',
+  data: {
+    tabuleiro: [
+      ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'],
+      ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+      [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+      [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+      [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+      ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+      ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+    ],
+    capturedPieces: [],
+    currentPlayer: 'Jogador 1',
+    score: {
+      player1: 0,
+      player2: 0,
+    },
+  },
+  methods: {
+    isValidMove(fromRow, fromCol, toRow, toCol) {
+      const chess = new Chess();
+      const board = chess.board();
+
+      
+      for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+          board[i][j] = this.tabuleiro[i][j];
+        }
+      }
+
+      const move = chess.move({ from: chess.square(fromRow, fromCol), to: chess.square(toRow, toCol) });
+      return move.san !== ''; 
+    },
+
+    handleCellClick(rowIndex, colIndex) {
+      const piece = this.tabuleiro[rowIndex][colIndex];
+
+      if (piece.trim() !== '' && this.isCurrentPlayerPiece(piece)) {
+        this.selectedPiece = `<span class="math-inline">\{rowIndex\}\-</span>{colIndex}`;
+      } else if (this.selectedPiece !== null) {
+        const [selectedRow, selectedCol] = this.selectedPiece.split('-');
+
+        if (this.isValidMove(selectedRow, selectedCol, rowIndex, colIndex)) {
+          const capturedPiece = this.tabuleiro[rowIndex][colIndex];
+
+          this.tabuleiro[rowIndex][colIndex] = this.tabuleiro[selectedRow][selectedCol];
+          this.tabuleiro[selectedRow][selectedCol] = ' ';
+
+          if (capturedPiece.trim() !== '') {
+            this.capturedPieces.push(capturedPiece);
+            this.updateScore(capturedPiece);
+          }
+
+          this.currentPlayer = this.currentPlayer === 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+
+          this.selectedPiece = null;
+          this.startPosition = null;
+        }
+      }
+    },
+
+    isCurrentPlayerPiece(piece) {
+      return piece.trim() !== '' && piece.charAt(0) === this.currentPlayer.charAt(0);
+    },
+
+    updateScore(capturedPiece) {
+      if (capturedPiece.charAt(0) === '♙') {
+        this.score.player2 += 1;
+      } else {
+        this.score.player1 += 1;
+      }
+    },
+
+    resetGame() {
+    
+        this.tabuleiro = [
             ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'],
             ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
             [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
             ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
-        ],
-        selectedPiece: null,
-        startPosition: null,
-        currentPlayer: 'Jogador 1',
-        score: {
-            player1: 0,
-            player2: 0,
-        },
-        capturedPieces: [],
-    },
-    methods: {
-        resetGame() {
-            // Mauricio é gostosoo
-        },
-
-        getCellClasses(rowIndex, colIndex) {
-            return {
-                'cell-black': (rowIndex + colIndex) % 2 === 1,
-                'selected': this.selectedPiece === `${rowIndex}-${colIndex}`,
-            };
-        },
-
-        handleCellClick(rowIndex, colIndex) {
-            const piece = this.tabuleiro[rowIndex][colIndex];
-
-            if (piece.trim() !== '' && this.isCurrentPlayerPiece(piece)) {
-                this.selectedPiece = `${rowIndex}-${colIndex}`;
-            } else if (this.selectedPiece !== null) {
-                const [selectedRow, selectedCol] = this.selectedPiece.split('-');
-
-                if (this.isValidMove(selectedRow, selectedCol, rowIndex, colIndex)) {
-                    const capturedPiece = this.tabuleiro[rowIndex][colIndex];
-                    this.tabuleiro[rowIndex][colIndex] = this.tabuleiro[selectedRow][selectedCol];
-                    this.tabuleiro[selectedRow][selectedCol] = ' ';
-
-                    if (capturedPiece.trim() !== '') {
-                        this.capturedPieces.push(capturedPiece);
-                    }
-
-                    if (capturedPiece.toLowerCase() === 'p') {
-                        this.updateScore(capturedPiece);
-                    }
-
-                    this.currentPlayer = this.currentPlayer === 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
-
-                    this.selectedPiece = null;
-                    this.startPosition = null;
-                }
-            }
-        },
-
-        isCurrentPlayerPiece(piece) {
-            return true; 
-        },
-
-        startDrag(rowIndex, colIndex) {
-            this.startPosition = { row: rowIndex, col: colIndex };
-        },
-
-        handleDrag(rowIndex, colIndex) {
-            if (this.selectedPiece !== null) {
-                  this.$set(this.tabuleiro, rowIndex, [...this.tabuleiro[rowIndex].slice(0, colIndex), this.tabuleiro[this.startPosition.row][this.startPosition.col], ...this.tabuleiro[rowIndex].slice(colIndex + 1)]);
-                this.$set(this.tabuleiro, this.startPosition.row, [...this.tabuleiro[this.startPosition.row].slice(0, this.startPosition.col), ' ', ...this.tabuleiro[this.startPosition.row].slice(this.startPosition.col + 1)]);
-            }
-        },
-
-        endDrag(rowIndex, colIndex) {
-            if (this.selectedPiece !== null) {
-                const [selectedRow, selectedCol] = this.selectedPiece.split('-');
-                this.currentPlayer = this.currentPlayer === 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
-                this.selectedPiece = null;
-                this.startPosition = null;
-            }
-        },
-    },
+        ]
+        ['♖', '♘', '♗']
+    }
+}
 });
